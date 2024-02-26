@@ -3,14 +3,14 @@ package main
 import (
 	"booking-app/helper"
 	"fmt" //means format for Input Output
-	"strings"
+	"strconv"
 )
 
 const conferenceTickets int = 50
 
 var conferenceName = "Go Conference"
 var remainingTickets uint = 50
-var bookings = []string{}
+var bookings = make([]map[string]string, 0) // this is how to initialize a List of maps
 
 func main() {
 
@@ -40,10 +40,19 @@ func main() {
 	}
 }
 
-func bookTickets(userTickets uint, firstName string, LastName string, email string) (uint, []string) {
+func bookTickets(userTickets uint, firstName string, LastName string, email string) (uint, []map[string]string) {
 	remainingTickets = remainingTickets - userTickets
 
-	bookings = append(bookings, firstName+" "+LastName)
+	// map
+	var userData = make(map[string]string)
+	// adding key value pair data
+	userData["firstName"] = firstName
+	userData["lastName"] = LastName
+	userData["email"] = email
+	userData["numberOfTickets"] = strconv.FormatUint(uint64(userTickets), 10) // This is how to convert a uint into a string
+
+	bookings = append(bookings, userData)
+	fmt.Printf("List of bookings is %v\n", bookings)
 
 	fmt.Printf("User %v %v booked %v tickets. you will get a confirmation email at %v \n", firstName, LastName, userTickets, email)
 	fmt.Printf("%v tickets remaining\n", remainingTickets)
@@ -73,8 +82,7 @@ func getUserInputs() (string, string, string, uint) {
 func getFirstNames() []string {
 	firstNames := []string{}
 	for _, booking := range bookings {
-		var names = strings.Fields(booking)
-		firstNames = append(firstNames, names[0])
+		firstNames = append(firstNames, booking["firstName"])
 	}
 	return firstNames
 }
