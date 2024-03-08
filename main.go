@@ -3,6 +3,8 @@ package main
 import (
 	"booking-app/helper"
 	"fmt" //means format for Input Output
+	"sync"
+	"time"
 )
 
 const conferenceTickets int = 50
@@ -19,6 +21,8 @@ type UserData struct {
 	numberOfTickets uint
 }
 
+var wg = sync.WaitGroup{}
+
 func main() {
 
 	greetUser()
@@ -31,8 +35,10 @@ func main() {
 
 		if isValidName && isValidEmail && isValidTicketNumber {
 			//slice simil List<T>
-			remainingTickets, bookings = bookTickets(userTickets, firstName, LastName, email)
-
+			//remainingTickets, bookings = bookTickets(userTickets, firstName, LastName, email)
+			bookTickets(userTickets, firstName, LastName, email)
+			wg.Add(1)
+			go sendTicket(userTickets, firstName, LastName, email)
 			//like a foreach
 			firstNames := getFirstNames()
 			fmt.Printf("The first names of the bookings are: %v \n", firstNames)
@@ -96,4 +102,13 @@ func getFirstNames() []string {
 func greetUser() {
 	fmt.Printf("Welcome to %v\n", conferenceName)
 	fmt.Printf("We have a total of %v remaining and %v are still available\n", conferenceTickets, remainingTickets)
+}
+
+func sendTicket(userTickets uint, firstName string, lastName string, email string) {
+	time.Sleep(10 * time.Second)                                                        // delay of 15sec
+	var ticket = fmt.Sprintf("%v tickets for %v, %v", userTickets, firstName, lastName) // x tickets for xUserName xLastName
+	fmt.Println("##############")
+	fmt.Printf("Sending %v this confirmation will be send to: %v \n", ticket, email)
+	fmt.Println("##############")
+	wg.Done()
 }
